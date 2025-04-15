@@ -16,13 +16,13 @@ router.post('/add-users', async(req, res) => {
         const hashed = await bcrypt.hash( password, 10);
         const user = new User({ username, email, password:hashed});
         await user.save();
-        res.status(201).json({ message: 'User added'});
+        res.status(201).json({ message: 'User added', user});
     }catch(error){
         res.status(500).json({ message: 'Error during registering'});
     }
 });
 
-router.get('/users', async(req, res) => {
+router.get('/', async(req, res) => {
     const users = await User.find();
     res.json(users);
 });
@@ -44,12 +44,12 @@ router.put('/user/:id', async(req, res) => {
     }
 });
 
-router.delete('user/:id', async(req, res) => {
+router.delete('/user/:id', async(req, res) => {
     try{
         const deleted = await User.findByIdAndDelete(req.params.id);
         if(!deleted)
             return res.status(404).json({message: 'User not found'})
-        res.json({message: 'User deleted', user});
+        res.json({message: 'User deleted', user: deleted});
     }catch(err){
         res.status(500).json({message: 'delete failed'})
     }
