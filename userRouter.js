@@ -22,4 +22,37 @@ router.post('/add-users', async(req, res) => {
     }
 });
 
+router.get('/users', async(req, res) => {
+    const users = await User.find();
+    res.json(users);
+});
+
+router.put('/user/:id', async(req, res) => {
+    const{ username, email } = req.body;
+    try{
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            {username, email},
+            {new: true, runValidators: true}
+        );
+
+        if(!user)
+            return res.status(404).json({message:'User not found'});
+        res.json({message:'User updated successfully', user});
+    }catch(error){
+        res.status(500).json({message: 'update failed', error: error.message});
+    }
+});
+
+router.delete('user/:id', async(req, res) => {
+    try{
+        const delete = await User.findByIdAndDelete(req.params.id);
+        if(!delete)
+            return res.status(404).json({message: 'User not found'})
+        res.json({message: 'User deleted', user});
+    }catch(err){
+        res.status(500).json({message: 'delete failed'})
+    }
+});
+
 module.exports = router;
